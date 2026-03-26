@@ -20,4 +20,11 @@ status_report:
     - <next step with owner>
   eta: <date or estimate>
   escalation_needed: <none|manager|leader|cto>
+  documentation:
+    source_of_truth: <confirmed|at-risk>
+    product_spec_path: <path>
+    technical_spec_path: <path>
+    decision_log_path: <path>
+    delivery_status_path: <path>
+    last_updated: <date>
 ```

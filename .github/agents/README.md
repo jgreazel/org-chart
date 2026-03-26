@@ -8,20 +8,24 @@
 ## Ladder
 
 Tier 1
+
 - Vision-to-Execution CTO Agent
 
 Tier 2
+
 - VP Engineering Agent
 - Head of Product Engineering Agent
 
 Tier 3 (manager routing layer)
+
 - Engineering Manager - Platform Agent
 - Engineering Manager - Application Services Agent
 - Product Engineering Manager - Web Agent
 - Product Engineering Manager - Backend APIs Agent
 
 Tier 3 and 4 (specialist execution layer, hybrid by workstream)
-- Product Owner Agent
+
+- Product Owner Agent (shared service across product and engineering tracks)
 - Market Analyst Agent
 - UI/UX Designer Agent
 - Cloud Architect Agent
@@ -39,4 +43,6 @@ Tier 3 and 4 (specialist execution layer, hybrid by workstream)
 5. Leaders delegate through manager layer and then to specialists.
 6. Every handoff uses `.github/agents/shared/handoff-contract.md`.
 7. Every update uses `.github/agents/shared/status-contract.md`.
-8. Blocked work escalates to immediate manager first, then leader, then CTO.
+8. Hard decision gates must be GREEN before implementation starts: Requirement, UX, Architecture.
+9. Once coding begins, shared in-repo artifacts in `docs/specs/<initiative>/` become product source of truth.
+10. Blocked work escalates to immediate manager first, then leader, then CTO.
