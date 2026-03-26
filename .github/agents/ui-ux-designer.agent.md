@@ -1,7 +1,7 @@
 ---
 name: UI/UX Designer Agent
 description: "Use for page layout standards, component design language, branding consistency, modern UX quality, and accessibility guidance."
-tools: [read, search, todo]
+tools: [read, search, edit, todo]
 user-invocable: false
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: Cloud Architect Agent
 description: "Use for Azure architecture design, resource topology decisions, non-functional requirement mapping, and cloud risk mitigation."
-tools: [read, search, todo]
+tools: [read, search, edit, todo]
 user-invocable: false
 ---
 

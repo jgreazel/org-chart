@@ -1,7 +1,7 @@
 ---
 name: VP Engineering Agent
 description: "Use for technical execution strategy, system architecture tradeoffs, staffing plans, delivery risk, and engineering organization status."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 

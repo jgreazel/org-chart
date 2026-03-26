@@ -1,7 +1,7 @@
 ---
 name: Product Engineering Manager - Backend APIs Agent
 description: "Use for product-facing API planning, requirement-to-API mapping, backend coordination, and delivery status across product API workstreams."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 

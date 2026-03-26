@@ -1,7 +1,7 @@
 ---
 name: Head of Product Engineering Agent
 description: "Use for requirement refinement, product vision decomposition, market-fit scrutiny, UX direction, and product engineering delivery alignment."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 

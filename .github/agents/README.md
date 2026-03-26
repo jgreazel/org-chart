@@ -51,3 +51,9 @@ Tier 3 and 4 (specialist execution layer, hybrid by workstream)
 8. Hard decision gates must be GREEN before implementation starts: Requirement, UX, Architecture.
 9. Once coding begins, shared in-repo artifacts in `docs/specs/<initiative>/` become product source of truth.
 10. Blocked work escalates to immediate manager first, then leader, then CTO.
+
+## Tooling Policy
+
+- Strategic, leadership, manager, and spec-authoring agents include `edit` so they can update shared artifacts, decision docs, and status reports.
+- Implementation agents include both `edit` and `execute` so they can change code and validate it.
+- Non-implementation roles should not receive `execute` unless they are expected to run builds, tests, or automation directly.

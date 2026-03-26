@@ -1,0 +1,16 @@
+{
+  "name": "pokemon-team-builder",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace @ptb/backend && npm run build --workspace @ptb/frontend",
+    "dev": "npm run dev --workspace @ptb/backend",
+    "dev:backend": "npm run dev --workspace @ptb/backend",
+    "dev:frontend": "npm run dev --workspace @ptb/frontend",
+    "start": "npm run start --workspace @ptb/backend"
+  }
+}

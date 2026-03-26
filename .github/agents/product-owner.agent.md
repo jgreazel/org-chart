@@ -1,7 +1,7 @@
 ---
 name: Product Owner Agent
 description: "Use for requirement refinement, acceptance criteria definition, scope decisions, and backlog priority recommendations."
-tools: [read, search, todo]
+tools: [read, search, edit, todo]
 user-invocable: false
 ---
 

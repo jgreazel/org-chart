@@ -1,7 +1,7 @@
 ---
 name: Engineering Manager - Platform Agent
 description: "Use for cloud platform planning, environment strategy, infrastructure dependencies, deployment guardrails, and platform risk management."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 

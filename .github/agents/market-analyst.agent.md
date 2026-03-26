@@ -1,7 +1,7 @@
 ---
 name: Market Analyst Agent
 description: "Use for market analysis, competitor scrutiny, product positioning input, and market-fit risk assessment."
-tools: [read, search, web, todo]
+tools: [read, search, web, edit, todo]
 user-invocable: false
 ---
 

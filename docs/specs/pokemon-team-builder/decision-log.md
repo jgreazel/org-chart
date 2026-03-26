@@ -59,3 +59,33 @@
 - Alternatives Considered: PokeAPI gym endpoints (rejected — unreliable/incomplete for all gens); SQLite (rejected — unnecessary complexity at MVP).
 - Impact: Manual curation of gym JSON files required; ensures accuracy.
 - Follow-up Actions: Create apps/backend/data/gyms/gen-1.json through gen-9.json during backend implementation.
+
+## DEC-007
+
+- Date: 2026-03-25
+- Decision ID: DEC-007
+- Context: CTO orchestration rerun after agent tooling updates.
+- Decision: Revalidated delivery with formal product and engineering handoffs. Architecture remains GREEN. Product readiness is AMBER until acceptance criteria operational checks are documented for AC-4, AC-6, and AC-8.
+- Alternatives Considered: Immediate full implementation start (rejected - violates gate discipline when readiness is AMBER).
+- Impact: Implementation planning and ticket preparation continue. New feature coding does not start until Requirement and UX operational checks return GREEN.
+- Follow-up Actions: Publish acceptance traceability addendum and UX/a11y operational checklist; rerun hard gate checkpoint.
+
+## DEC-008
+
+- Date: 2026-03-25
+- Decision ID: DEC-008
+- Context: Gate-hardening artifacts requested by CTO after orchestration rerun.
+- Decision: Published acceptance traceability and UX/a11y operational checklist artifacts in docs/specs/pokemon-team-builder. Requirement gate moved to GREEN. UX gate remains AMBER until checklist execution evidence is attached.
+- Alternatives Considered: Keep Requirement gate AMBER until QA execution (rejected - requirement clarity objective already met by explicit pass/fail mapping).
+- Impact: Hard-gate blocker narrows to UX execution evidence only.
+- Follow-up Actions: QA and Web run checklist at 375px and 1440px, attach evidence, then rerun gate review.
+
+## DEC-009
+
+- Date: 2026-03-25
+- Decision ID: DEC-009
+- Context: Founder approved immediate QA and Web execution delegation under strict gate policy.
+- Decision: Executed formal gate checkpoint with QA Quality Engineer and Product Engineering Manager - Web. Requirement gate confirmed GREEN for clarity/readiness, UX gate remains AMBER because execution is NOT TESTABLE until runnable implementation exists.
+- Alternatives Considered: Move UX gate to GREEN based on documentation only (rejected - evidence requirement is mandatory).
+- Impact: No feature-code merges permitted until UX checklist evidence exists and gate is rerun.
+- Follow-up Actions: UI Engineer delivers runnable vertical slice; QA/Web execute UX-001 through UX-018 with evidence package and request CTO gate review.

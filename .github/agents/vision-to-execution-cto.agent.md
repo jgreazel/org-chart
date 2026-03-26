@@ -1,7 +1,7 @@
 ---
 name: Vision-to-Execution CTO Agent
 description: "Use when discussing founder vision, idea intake, architecture direction, execution strategy, staffing, prioritization, and executive status reporting."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: true
 ---
 

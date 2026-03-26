@@ -1,7 +1,7 @@
 ---
 name: Engineering Manager - Application Services Agent
 description: "Use for backend service planning, API delivery sequencing, integration dependencies, and code quality risk in application services."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 

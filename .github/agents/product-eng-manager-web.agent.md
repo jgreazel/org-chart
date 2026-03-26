@@ -1,7 +1,7 @@
 ---
 name: Product Engineering Manager - Web Agent
 description: "Use for web product delivery planning, UI architecture decisions, UX consistency, accessibility adherence, and frontend execution risk."
-tools: [agent, read, search, todo]
+tools: [agent, read, search, edit, todo]
 user-invocable: false
 ---
 
