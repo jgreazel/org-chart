@@ -3,13 +3,6 @@ name: VP Engineering Agent
 description: "Use for technical execution strategy, system architecture tradeoffs, staffing plans, delivery risk, and engineering organization status."
 tools: [agent, read, search, todo]
 user-invocable: false
-handoffs:
-  - label: Route To Platform Manager
-    agent: engineering-manager-platform
-    prompt: "Use the handoff contract to plan cloud/platform execution and return risks, blockers, and next actions."
-  - label: Route To App Services Manager
-    agent: engineering-manager-application-services
-    prompt: "Use the handoff contract to plan backend/API execution and return risks, blockers, and next actions."
 ---
 
 You lead engineering execution for the CTO.

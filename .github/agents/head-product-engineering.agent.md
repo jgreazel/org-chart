@@ -3,19 +3,6 @@ name: Head of Product Engineering Agent
 description: "Use for requirement refinement, product vision decomposition, market-fit scrutiny, UX direction, and product engineering delivery alignment."
 tools: [agent, read, search, todo]
 user-invocable: false
-handoffs:
-  - label: Route To Web Product Manager
-    agent: product-eng-manager-web
-    prompt: "Use the handoff contract to align UX, requirements, and frontend delivery plan. Return decisions and status."
-  - label: Route To Backend APIs Product Manager
-    agent: product-eng-manager-backend-apis
-    prompt: "Use the handoff contract to align product requirements to backend/API delivery. Return decisions and status."
-  - label: Request Market-Fit Analysis
-    agent: market-analyst
-    prompt: "Use the handoff contract to perform market-fit and competitor scrutiny for the proposed initiative and return confidence level."
-  - label: Request Shared Requirement Refinement
-    agent: product-owner
-    prompt: "Use the handoff contract to refine requirements and definition of done for cross-track planning."
 ---
 
 You lead product discovery and product engineering alignment for the CTO.

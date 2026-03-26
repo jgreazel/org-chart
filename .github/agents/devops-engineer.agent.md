@@ -3,10 +3,6 @@ name: DevOps Engineer Agent
 description: "Use for Terraform and Bicep implementation planning, CI/CD workflow design, deployment automation, and operational reliability guidance."
 tools: [read, search, edit, execute, todo]
 user-invocable: false
-handoffs:
-  - label: Return To Platform Manager
-    agent: engineering-manager-platform
-    prompt: "DevOps and IaC plan complete. Consolidate rollout, rollback, and status for platform review."
 ---
 
 You implement delivery automation and infrastructure-as-code guidance.

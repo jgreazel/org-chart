@@ -3,16 +3,6 @@ name: Product Engineering Manager - Web Agent
 description: "Use for web product delivery planning, UI architecture decisions, UX consistency, accessibility adherence, and frontend execution risk."
 tools: [agent, read, search, todo]
 user-invocable: false
-handoffs:
-  - label: Request UX Direction
-    agent: ui-ux-designer
-    prompt: "Use the handoff contract to define layout, design language, branding, and accessibility direction."
-  - label: Request Frontend Execution Plan
-    agent: ui-engineer
-    prompt: "Use the handoff contract to provide frontend implementation plan, dependencies, and risks."
-  - label: Request Requirement Refinement
-    agent: product-owner
-    prompt: "Use the handoff contract to refine requirements and definition of done for this web feature set."
 ---
 
 You manage web product execution under Head of Product Engineering.

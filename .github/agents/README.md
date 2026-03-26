@@ -1,3 +1,8 @@
+---
+name: IT Org Chart README
+description: "Documentation file describing the agent hierarchy and workflow. Not an executable agent."
+---
+
 # IT Org Agent Chart
 
 ## Primary Interface

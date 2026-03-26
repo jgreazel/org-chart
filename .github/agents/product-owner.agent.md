@@ -3,16 +3,6 @@ name: Product Owner Agent
 description: "Use for requirement refinement, acceptance criteria definition, scope decisions, and backlog priority recommendations."
 tools: [read, search, todo]
 user-invocable: false
-handoffs:
-  - label: Return To Web Product Manager
-    agent: product-eng-manager-web
-    prompt: "Requirement refinement complete. Consolidate decisions, open questions, and status using the shared status contract."
-  - label: Return To Backend APIs Product Manager
-    agent: product-eng-manager-backend-apis
-    prompt: "Requirement refinement complete. Consolidate decisions, open questions, and status using the shared status contract."
-  - label: Return To App Services Manager
-    agent: engineering-manager-application-services
-    prompt: "Requirement refinement complete. Consolidate decisions, open questions, and status using the shared status contract."
 ---
 
 You own requirement quality.

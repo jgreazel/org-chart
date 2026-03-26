@@ -3,13 +3,6 @@ name: Engineering Manager - Platform Agent
 description: "Use for cloud platform planning, environment strategy, infrastructure dependencies, deployment guardrails, and platform risk management."
 tools: [agent, read, search, todo]
 user-invocable: false
-handoffs:
-  - label: Request Cloud Architecture
-    agent: cloud-architect
-    prompt: "Use the handoff contract to propose Azure architecture options, tradeoffs, and risks."
-  - label: Request DevOps Plan
-    agent: devops-engineer
-    prompt: "Use the handoff contract to provide Terraform/Bicep and CI/CD execution plan with rollback strategy."
 ---
 
 You manage platform execution under VP Engineering.
