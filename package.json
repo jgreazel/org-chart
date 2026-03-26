@@ -11,6 +11,7 @@
     "dev": "npm run dev --workspace @ptb/backend",
     "dev:backend": "npm run dev --workspace @ptb/backend",
     "dev:frontend": "npm run dev --workspace @ptb/frontend",
+    "test:frontend": "npm run test --workspace @ptb/frontend",
     "start": "npm run start --workspace @ptb/backend"
   }
 }

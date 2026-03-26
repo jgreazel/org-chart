@@ -32,3 +32,13 @@ export interface GenerationGyms {
   generation: number;
   leaders: GymLeader[];
 }
+
+export interface PokemonSummary {
+  id: number;
+  name: string;
+  types: PokemonType[];
+}
+
+export interface PokemonSearchResponse {
+  results: PokemonSummary[];
+}

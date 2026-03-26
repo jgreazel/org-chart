@@ -37,6 +37,109 @@ h1 {
   border: 2px solid rgba(255, 204, 3, 0.35);
 }
 
+.controls {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+input,
+select,
+button {
+  border: 1px solid #a2b9dc;
+  border-radius: 10px;
+  padding: 0.6rem 0.7rem;
+  font: inherit;
+}
+
+button {
+  background: var(--accent);
+  color: #23324f;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  filter: brightness(0.97);
+}
+
+.team-list {
+  display: grid;
+  gap: 0.45rem;
+  list-style: none;
+  padding-left: 0;
+}
+
+.suggestions {
+  list-style: none;
+  margin: 0 0 0.75rem;
+  padding-left: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.suggestion-button {
+  width: 100%;
+  text-align: left;
+  background: #f0f6ff;
+  border-color: #c4d8f5;
+}
+
+.team-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.6rem;
+  background: #f8fbff;
+  border-radius: 10px;
+}
+
+.item-enter {
+  animation: itemIn 180ms ease-out;
+}
+
+.item-exit {
+  animation: itemOut 180ms ease-in forwards;
+}
+
+#gymLeaders.reveal {
+  animation: revealIn 260ms ease-out;
+}
+
+@keyframes itemIn {
+  from {
+    transform: translateY(6px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes itemOut {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-6px);
+    opacity: 0;
+  }
+}
+
+@keyframes revealIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 ul {
   padding-left: 1rem;
   margin: 0;
@@ -45,5 +148,10 @@ ul {
 @media (min-width: 900px) {
   .page {
     padding: 2rem;
+  }
+
+  .controls {
+    grid-template-columns: 1fr auto;
+    align-items: end;
   }
 }

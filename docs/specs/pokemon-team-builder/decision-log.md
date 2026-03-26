@@ -89,3 +89,63 @@
 - Alternatives Considered: Move UX gate to GREEN based on documentation only (rejected - evidence requirement is mandatory).
 - Impact: No feature-code merges permitted until UX checklist evidence exists and gate is rerun.
 - Follow-up Actions: UI Engineer delivers runnable vertical slice; QA/Web execute UX-001 through UX-018 with evidence package and request CTO gate review.
+
+## DEC-010
+
+- Date: 2026-03-25
+- Decision ID: DEC-010
+- Context: First user-facing feature implementation pass.
+- Decision: Implement team builder interactions in frontend now with max team size of 6, explicit add/remove behavior, and friendly validation messaging.
+- Alternatives Considered: Keep frontend as API-only diagnostics page (rejected - does not progress AC-1 behavior).
+- Impact: AC-1 execution can start once dependencies are installed and app is run.
+- Follow-up Actions: Add automated tests for team-size guard and remove behavior.
+
+## DEC-011
+
+- Date: 2026-03-25
+- Decision ID: DEC-011
+- Context: Team persistence and sharing implementation during MVP build.
+- Decision: Persist team state in localStorage and mirror team names in URL query string (`team=name1,name2,...`) for shareability.
+- Alternatives Considered: localStorage-only persistence (rejected - no sharing); URL-only persistence (rejected - poor resilience).
+- Impact: AC-7 and AC-8 implementation paths are now active in code.
+- Follow-up Actions: Add decode validation tests for malformed and over-limit URL team params.
+
+## DEC-012
+
+- Date: 2026-03-25
+- Decision ID: DEC-012
+- Context: Need a searchable Pokemon list before full PokeAPI integration.
+- Decision: Add backend `/api/pokemon/search` endpoint backed by a curated static Pokemon catalog for MVP development velocity.
+- Alternatives Considered: Full live PokeAPI integration immediately (deferred - adds reliability and caching complexity too early).
+- Impact: Frontend can support search/add flows now while preserving a future swap to PokeAPI-backed search.
+- Follow-up Actions: Replace static catalog with proxied/cached PokeAPI source in a later backend increment.
+
+## DEC-013
+
+- Date: 2026-03-25
+- Decision ID: DEC-013
+- Context: Improve team-builder usability during first feature pass.
+- Decision: Add live suggestion list under search input and enforce duplicate prevention on team add.
+- Alternatives Considered: Button-only add with no suggestion hints (rejected - slower UX and higher input error rate).
+- Impact: Improves AC-1 usability while keeping team model constraints intact.
+- Follow-up Actions: Add keyboard navigation for suggestion list as accessibility enhancement.
+
+## DEC-014
+
+- Date: 2026-03-25
+- Decision ID: DEC-014
+- Context: Begin implementing AC-6 animation expectations.
+- Decision: Introduce CSS animation hooks for team item add/remove and gym results reveal using lightweight keyframes.
+- Alternatives Considered: Defer all animation work until late polish phase (rejected - raises integration and UX risk).
+- Impact: Creates baseline for AC-6 checks; reduced-motion fallback remains to be added.
+- Follow-up Actions: Add `prefers-reduced-motion` behavior and validate via UX checklist.
+
+## DEC-015
+
+- Date: 2026-03-25
+- Decision ID: DEC-015
+- Context: Need executable proof path for AC-1, AC-7, and AC-8 logic.
+- Decision: Add frontend unit tests for team limit, duplicate checks, URL encode/decode, and restore behavior using Vitest.
+- Alternatives Considered: Manual-only validation (rejected - insufficient repeatability for gate evidence).
+- Impact: Establishes repeatable test harness for critical team state logic.
+- Follow-up Actions: Install dependencies and run `npm run test:frontend` in CI/local pipeline.

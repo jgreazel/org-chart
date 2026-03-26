@@ -10,18 +10,48 @@
     <main class="page">
       <header>
         <h1>Pokemon Team Builder</h1>
-        <p>First runnable MVP slice: type chart and gym endpoint validation.</p>
+        <p>Build a team of up to 6 Pokemon and share it by URL.</p>
       </header>
+
+      <section class="card">
+        <h2>Team Builder</h2>
+        <div class="controls">
+          <label for="pokemonQuery">Pokemon name</label>
+          <input id="pokemonQuery" type="text" placeholder="Try pikachu" />
+          <button id="addPokemon">Add to team</button>
+        </div>
+        <ul id="pokemonSuggestions" class="suggestions"></ul>
+        <p id="teamMessage" aria-live="polite"></p>
+        <p id="shareLink"></p>
+        <ul id="teamList" class="team-list"></ul>
+      </section>
+
       <section class="card">
         <h2>API Health</h2>
         <p id="health">Checking...</p>
       </section>
+
       <section class="card">
         <h2>Type Chart</h2>
         <p id="typeCount">Loading...</p>
       </section>
+
       <section class="card">
-        <h2>Gen 1 Gym Sample</h2>
+        <h2>Gym Sample</h2>
+        <div class="controls">
+          <label for="generationSelect">Generation</label>
+          <select id="generationSelect">
+            <option value="1">Gen 1</option>
+            <option value="2">Gen 2</option>
+            <option value="3">Gen 3</option>
+            <option value="4">Gen 4</option>
+            <option value="5">Gen 5</option>
+            <option value="6">Gen 6</option>
+            <option value="7">Gen 7</option>
+            <option value="8">Gen 8</option>
+            <option value="9">Gen 9</option>
+          </select>
+        </div>
         <ul id="gymLeaders"></ul>
       </section>
     </main>

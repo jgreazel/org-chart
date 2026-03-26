@@ -1,6 +1,7 @@
 import cors from "cors";
 import express, { Request, Response } from "express";
 import { gymsByGeneration } from "./data/gyms";
+import { pokemonCatalog } from "./data/pokemon";
 import { typeChart } from "./data/type-chart";
 
 const app = express();
@@ -15,6 +16,23 @@ app.get("/health", (_req: Request, res: Response) => {
 
 app.get("/api/types/chart", (_req: Request, res: Response) => {
   res.json({ chart: typeChart, typeCount: Object.keys(typeChart).length });
+});
+
+app.get("/api/pokemon/search", (req: Request, res: Response) => {
+  const q = String(req.query.q ?? "")
+    .trim()
+    .toLowerCase();
+
+  if (!q) {
+    res.json({ results: pokemonCatalog.slice(0, 12) });
+    return;
+  }
+
+  const results = pokemonCatalog
+    .filter((pokemon) => pokemon.name.includes(q))
+    .slice(0, 12);
+
+  res.json({ results });
 });
 
 app.get("/api/gyms", (req: Request, res: Response) => {
