@@ -37,6 +37,91 @@ const generationSelectEl = document.getElementById(
 let team: PokemonSummary[] = [];
 let currentSearchResults: PokemonSummary[] = [];
 let revealAnimated = false;
+let storedTypeChart: Record<string, Record<string, number>> | null = null;
+
+function typePill(type: string): string {
+  return `<span class="type-pill type-${type}">${type}</span>`;
+}
+
+function computeTypeCoverage(
+  teamPokemon: PokemonSummary[],
+  chart: Record<string, Record<string, number>>,
+) {
+  const allTypes = Object.keys(chart);
+  const attackCoverage = new Set<string>();
+  const weaknessHits = new Map<string, number>();
+
+  for (const pokemon of teamPokemon) {
+    for (const atkType of pokemon.types) {
+      const row = chart[atkType] ?? {};
+      for (const [defType, eff] of Object.entries(row)) {
+        if (eff >= 2) attackCoverage.add(defType);
+      }
+    }
+    for (const atkType of allTypes) {
+      const row = chart[atkType] ?? {};
+      let totalEff = 1;
+      for (const defType of pokemon.types) {
+        totalEff *= row[defType] ?? 1;
+      }
+      if (totalEff >= 2) {
+        weaknessHits.set(atkType, (weaknessHits.get(atkType) ?? 0) + 1);
+      }
+    }
+  }
+
+  const coverageGaps = allTypes.filter((t) => !attackCoverage.has(t)).sort();
+  const teamWeaknesses = [...weaknessHits.entries()]
+    .filter(([, count]) => count >= 2)
+    .sort((a, b) => b[1] - a[1])
+    .map(([type]) => type);
+
+  return {
+    attackCoverage: [...attackCoverage].sort(),
+    teamWeaknesses,
+    coverageGaps,
+  };
+}
+
+function renderTypeCoverage() {
+  const section = document.getElementById("coverageSection");
+  if (!section) return;
+
+  if (!storedTypeChart || team.length === 0) {
+    section.innerHTML =
+      '<p class="coverage-empty">Add Pokemon to your team to see coverage analysis.</p>';
+    return;
+  }
+
+  const { attackCoverage, teamWeaknesses, coverageGaps } = computeTypeCoverage(
+    team,
+    storedTypeChart,
+  );
+
+  section.innerHTML = `
+    <div class="coverage-grid">
+      <div class="coverage-item">
+        <h3>Super Effective Against <span class="badge badge-green">${attackCoverage.length} / 18</span></h3>
+        <div class="type-pills">${attackCoverage.length > 0 ? attackCoverage.map(typePill).join("") : '<span class="coverage-empty">None yet</span>'}</div>
+      </div>
+      <div class="coverage-item">
+        <h3>Team Weaknesses <span class="badge badge-red">${teamWeaknesses.length}</span></h3>
+        ${
+          teamWeaknesses.length > 0
+            ? `<div class="type-pills">${teamWeaknesses.map(typePill).join("")}</div>`
+            : '<p class="coverage-ok">No shared weaknesses!</p>'
+        }
+      </div>
+      <div class="coverage-item">
+        <h3>Coverage Gaps <span class="badge badge-amber">${coverageGaps.length}</span></h3>
+        ${
+          coverageGaps.length > 0
+            ? `<div class="type-pills">${coverageGaps.map(typePill).join("")}</div>`
+            : '<p class="coverage-ok">Full type coverage!</p>'
+        }
+      </div>
+    </div>`;
+}
 
 function saveTeam() {
   localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(team));
@@ -72,6 +157,7 @@ function renderTeam() {
     const li = document.createElement("li");
     li.textContent = "No Pokemon selected yet.";
     teamListEl.appendChild(li);
+    renderTypeCoverage();
     return;
   }
 
@@ -80,7 +166,8 @@ function renderTeam() {
     li.className = "team-item item-enter";
 
     const label = document.createElement("span");
-    label.textContent = `${pokemon.name} (#${pokemon.id}) - ${pokemon.types.join(", ")}`;
+    label.className = "team-item-label";
+    label.innerHTML = `<strong>${pokemon.name}</strong> <span class="team-item-id">#${pokemon.id}</span> ${pokemon.types.map(typePill).join("")}`;
 
     const removeButton = document.createElement("button");
     removeButton.textContent = "Remove";
@@ -102,6 +189,8 @@ function renderTeam() {
     li.appendChild(removeButton);
     teamListEl.appendChild(li);
   }
+
+  renderTypeCoverage();
 }
 
 function renderSuggestions() {
@@ -113,7 +202,7 @@ function renderSuggestions() {
     const button = document.createElement("button");
     button.type = "button";
     button.className = "suggestion-button";
-    button.textContent = `${pokemon.name} (${pokemon.types.join("/")})`;
+    button.innerHTML = `${pokemon.name} ${pokemon.types.map(typePill).join("")}`;
     button.addEventListener("click", () => {
       addPokemonByName(pokemon.name);
       if (queryInputEl) {
@@ -190,7 +279,9 @@ async function loadTypeChart() {
   try {
     const res = await fetch("/api/types/chart");
     const data = (await res.json()) as TypeChartResponse;
+    storedTypeChart = data.chart;
     el.textContent = `Loaded ${data.typeCount} types.`;
+    renderTypeCoverage();
   } catch {
     el.textContent = "Failed to load type chart.";
   }
@@ -212,7 +303,8 @@ async function loadGymSample(generation = 1) {
 
     for (const leader of data.leaders) {
       const li = document.createElement("li");
-      li.textContent = `${leader.name}: ${leader.pokemonTypes.join(", ")}`;
+      li.className = "gym-leader-item";
+      li.innerHTML = `<span class="gym-leader-name">${leader.name}</span><span class="type-pills">${leader.pokemonTypes.map(typePill).join("")}</span>`;
       list.appendChild(li);
     }
 
@@ -262,6 +354,37 @@ function wireEvents() {
   });
 }
 
+function initAds() {
+  const publisherId = (
+    import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
+  )?.trim();
+  if (!publisherId) return;
+
+  const script = document.createElement("script");
+  script.async = true;
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
+  script.setAttribute("crossorigin", "anonymous");
+  document.head.appendChild(script);
+
+  const coverageCard = document
+    .getElementById("coverageSection")
+    ?.closest(".card");
+  if (coverageCard) {
+    const adWrap = document.createElement("div");
+    adWrap.className = "ad-unit";
+    const ins = document.createElement("ins");
+    ins.className = "adsbygoogle";
+    ins.style.cssText = "display:block";
+    ins.setAttribute("data-ad-client", publisherId);
+    ins.setAttribute("data-ad-format", "auto");
+    ins.setAttribute("data-full-width-responsive", "true");
+    adWrap.appendChild(ins);
+    coverageCard.insertAdjacentElement("afterend", adWrap);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
+  }
+}
+
 void searchPokemon("").then(() => {
   hydrateTeam();
   renderSuggestions();
@@ -270,3 +393,4 @@ wireEvents();
 void loadHealth();
 void loadTypeChart();
 void loadGymSample();
+initAds();

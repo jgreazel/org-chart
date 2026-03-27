@@ -153,5 +153,130 @@ ul {
   .controls {
     grid-template-columns: 1fr auto;
     align-items: end;
+  @media (min-width: 900px) {
+    .page {
+      padding: 2rem;
+    }
+
+    .controls {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+
+    .coverage-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+
+  /* ── Type pills ── */
+  .type-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-top: 0.25rem;
+  }
+
+  .type-pill {
+    display: inline-block;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    text-transform: capitalize;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+    white-space: nowrap;
+  }
+
+  .type-normal   { background: #9a9a7a; }
+  .type-fire     { background: #e8642c; }
+  .type-water    { background: #4a7ed0; }
+  .type-electric { background: #c8a800; }
+  .type-grass    { background: #5ca838; }
+  .type-ice      { background: #5cb8b8; color: #1a3a3a; }
+  .type-fighting { background: #a02020; }
+  .type-poison   { background: #883090; }
+  .type-ground   { background: #b89840; color: #3a2800; }
+  .type-flying   { background: #8070d8; }
+  .type-psychic  { background: #d83870; }
+  .type-bug      { background: #88a018; }
+  .type-rock     { background: #908028; }
+  .type-ghost    { background: #504878; }
+  .type-dragon   { background: #5828e8; }
+  .type-dark     { background: #584838; }
+  .type-steel    { background: #8888a8; color: #1a1a2a; }
+  .type-fairy    { background: #d070a0; }
+
+  /* ── Coverage section ── */
+  .coverage-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .coverage-item h3 {
+    margin: 0 0 0.4rem;
+    font-size: 0.88rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-size: 0.68rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 99px;
+    font-weight: 700;
+  }
+
+  .badge-green  { background: #d1fae5; color: #065f46; }
+  .badge-red    { background: #fee2e2; color: #991b1b; }
+  .badge-amber  { background: #fef3c7; color: #78350f; }
+
+  .coverage-ok {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #065f46;
+    font-style: italic;
+  }
+
+  .coverage-empty {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  /* ── Gym leader items ── */
+  .gym-leader-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0;
+    flex-wrap: wrap;
+  }
+
+  .gym-leader-name {
+    font-weight: 600;
+    min-width: 10ch;
+  }
+
+  /* ── Team item improvements ── */
+  .team-item-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .team-item-id {
+    font-size: 0.75rem;
+    color: #6b7280;
+  }
+
+  /* ── AdSense ad unit ── */
+  .ad-unit {
+    overflow: hidden;
+    border-radius: 8px;
+  }
   }
 }

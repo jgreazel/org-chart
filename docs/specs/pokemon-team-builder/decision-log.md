@@ -149,3 +149,23 @@
 - Alternatives Considered: Manual-only validation (rejected - insufficient repeatability for gate evidence).
 - Impact: Establishes repeatable test harness for critical team state logic.
 - Follow-up Actions: Install dependencies and run `npm run test:frontend` in CI/local pipeline.
+
+## DEC-016
+
+- Date: 2026-03-26
+- Decision ID: DEC-016
+- Context: Founder requested explicit allocation of agents for unresolved decisions and implementation sequencing.
+- Decision: Use a lean gate-first operating model. Decision work is owned by a small decision pod before broader implementation proceeds. Founder approval is required for wedge user, MVP success criteria, monetization policy, ad-removal semantics, and early-user feedback loop. Product and engineering implementation proceeds only after upstream decisions are locked or where work is already approved and does not violate gate policy.
+- Alternatives Considered: Full parallel implementation (rejected - violates current UX gate posture and increases rework risk); ad hoc allocation without shared ownership mapping (rejected - creates decision ambiguity).
+- Impact: Reduces rework, clarifies approval boundaries, and keeps implementation aligned with current Requirement/UX/Architecture gate discipline.
+- Follow-up Actions: Record active owner map in delivery-status; re-run gate checkpoint after UX evidence and documentation reconciliation.
+
+## DEC-017
+
+- Date: 2026-03-26
+- Decision ID: DEC-017
+- Context: Need explicit ownership for current initiative workstreams under the lean gate-first model.
+- Decision: Assign Product Owner Agent, Market Analyst Agent, QA Quality Engineer Agent, and Head of Product Engineering Agent to the decision pod; assign Product Engineering Manager - Web Agent, UI Engineer Agent, Product Engineering Manager - Backend APIs Agent, Backend Engineer Agent, Engineering Manager - Platform Agent, DevOps Engineer Agent, and QA Quality Engineer Agent to implementation workstreams with VP Engineering and CTO oversight.
+- Alternatives Considered: Single-agent ownership per domain (rejected - insufficient cross-functional control for product promise, QA evidence, and platform readiness).
+- Impact: Creates explicit ownership for decision recommendations, founder approval asks, frontend hardening, backend data accuracy, QA evidence, and platform readiness.
+- Follow-up Actions: Keep delivery-status synchronized with agent allocations and update ownership after founder approvals change scope or sequence.

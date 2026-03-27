@@ -1,51 +1,38 @@
 # Handoff Contract
 
-Use this contract for every agent-to-agent transition.
+Use this contract for every agent-to-agent delegation. Keep it lightweight — the goal is to enable fast delegation, not to create bureaucracy.
 
 ```yaml
 handoff:
   from: <current_agent>
   to: <next_agent>
-  objective: <single clear goal>
-  definition_of_done:
-    - <verifiable completion criterion>
-  constraints:
-    - <time, budget, policy, architecture>
-  assumptions:
-    - <explicit assumptions>
-  required_context:
-    business_context: <why this matters now>
-    technical_context: <known system details>
-    dependencies:
-      - <people, systems, services>
-  deliverables:
-    - <artifact to return>
-  shared_artifacts:
-    product_spec: <path to product-spec.md>
-    technical_spec: <path to technical-spec.md>
-    decision_log: <path to decision-log.md>
-    delivery_status: <path to delivery-status.md>
-  open_questions:
-    - <question needing decision>
-  escalation_path: <who to escalate to first>
+  task: <what to do — one sentence>
+  files_to_change:
+    - <exact file path to create or edit>
+  done_when:
+    - <observable result — a file exists, a test passes, a feature works>
+  context: <1-2 sentences of relevant background>
+  escalation: <who to ask if stuck>
 ```
 
-## Hard Decision Gates
+## Rules
 
-Before implementation starts, confirm these are GREEN:
+1. **Keep handoffs small and specific.** One task per handoff. If the work is big, split it into multiple handoffs.
+2. **Always specify file paths.** The receiving agent must know exactly which files to touch.
+3. **Do not block on missing information.** If context is incomplete, the receiving agent makes a reasonable assumption, documents it in a code comment, and proceeds.
+4. **No gate-checking before execution.** Quality gates (Requirement, UX, Architecture) are concurrent review checkpoints — they never block implementation from starting.
 
-1. Requirement Gate: objective, scope, and acceptance criteria are approved.
-2. UX Gate: UX direction and accessibility checks are approved.
-3. Architecture Gate: architecture and delivery approach are approved.
+## Quality Checkpoints (Non-Blocking)
 
-If any gate is not GREEN, escalate through manager -> leader -> CTO.
+These run in parallel with implementation. Flag issues but do not halt work:
 
-## Documentation Source Of Truth
+- Requirement checkpoint: Are we building the right thing? If unclear, build the most reasonable interpretation and flag the ambiguity.
+- UX checkpoint: Is the interface usable and accessible? If not, fix it in-flight.
+- Architecture checkpoint: Is the approach sound? If not, course-correct without stopping.
 
-When coding starts, require the shared artifacts defined in `.github/agents/shared/documentation-contract.md`.
-Handoffs must include artifact paths and update expectations.
+## Documentation
 
-## Initial Prompt To Next Agent
+Update `docs/specs/<initiative>/` artifacts as work progresses. Docs follow code — they are never a pre-condition for code.
 
 ```text
 You are receiving a formal handoff.

@@ -1,30 +1,26 @@
 # Status Contract
 
-All agents report status in this exact shape.
+All agents report status in this shape. **Status reports are only valid when accompanied by actual work output (files created/modified).**
 
 ```yaml
 status_report:
   owner: <agent_name>
-  objective: <what this workstream is trying to achieve>
+  task: <what was asked>
   health: <GREEN|AMBER|RED>
-  summary: <2-4 sentences>
+  files_changed:
+    - <path to file created or modified>
   completed:
-    - <completed item>
+    - <what was done>
   in_progress:
-    - <active item>
+    - <what is actively being worked on>
   blockers:
-    - <blocker and impact>
-  risks:
-    - <risk and mitigation>
+    - <blocker — must include your proposed resolution>
   next_actions:
-    - <next step with owner>
-  eta: <date or estimate>
-  escalation_needed: <none|manager|leader|cto>
-  documentation:
-    source_of_truth: <confirmed|at-risk>
-    product_spec_path: <path>
-    technical_spec_path: <path>
-    decision_log_path: <path>
-    delivery_status_path: <path>
-    last_updated: <date>
+    - <concrete next step with owner>
 ```
+
+## Rules
+
+- A status report with zero files_changed is a failure. Investigate why and fix it.
+- AMBER and RED health do not halt work. They signal that course correction is needed while continuing.
+- Blockers must always include the agent's proposed resolution. "I'm blocked" without a proposal is not acceptable.

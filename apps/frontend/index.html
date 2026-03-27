@@ -38,6 +38,38 @@
 
       <section class="card">
         <h2>Gym Sample</h2>
+              <section class="card">
+                <h2>Team Builder</h2>
+                <div class="controls">
+                  <label for="pokemonQuery">Pokemon name</label>
+                  <input id="pokemonQuery" type="text" placeholder="Try pikachu" />
+                  <button id="addPokemon">Add to team</button>
+                </div>
+                <ul id="pokemonSuggestions" class="suggestions"></ul>
+                <p id="teamMessage" aria-live="polite"></p>
+                <p id="shareLink"></p>
+                <ul id="teamList" class="team-list"></ul>
+              </section>
+
+              <section class="card">
+                <h2>Type Coverage</h2>
+                <div id="coverageSection">
+                  <p class="coverage-empty">Add Pokemon to your team to see coverage analysis.</p>
+                </div>
+              </section>
+
+              <section class="card">
+                <h2>API Health</h2>
+                <p id="health">Checking...</p>
+              </section>
+
+              <section class="card">
+                <h2>Type Chart</h2>
+                <p id="typeCount">Loading...</p>
+              </section>
+
+              <section class="card">
+                <h2>Gym Leaders</h2>
         <div class="controls">
           <label for="generationSelect">Generation</label>
           <select id="generationSelect">

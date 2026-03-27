@@ -1,27 +1,26 @@
 # Documentation Artifact Contract
 
-This contract is mandatory once implementation starts.
+Documentation exists to capture decisions and enable future work. It must never block current work.
 
 ## Core Rule
 
-In-repo documentation/specification is the product source of truth.
-Code is the delivery artifact that must trace back to approved docs.
+Code ships first. Docs follow immediately after. A working feature with rough docs is better than perfect docs with no code.
 
 ## Required Shared Artifacts
 
-Create and maintain these files for each initiative:
+Maintain these files for each initiative in `docs/specs/<initiative>/`:
 
-1. `docs/specs/<initiative>/product-spec.md`
-2. `docs/specs/<initiative>/technical-spec.md`
-3. `docs/specs/<initiative>/decision-log.md`
-4. `docs/specs/<initiative>/delivery-status.md`
+1. `product-spec.md` — requirements and acceptance criteria
+2. `technical-spec.md` — architecture decisions and implementation approach
+3. `decision-log.md` — key decisions with rationale
+4. `delivery-status.md` — current status and next actions
 
-## Quality Rules
+## Rules
 
-1. Do not start coding until product-spec and technical-spec exist.
-2. Every major code change references a spec section or decision log entry.
-3. If code and docs conflict, update docs first, then code.
-4. Agents update delivery-status at every status report checkpoint.
+1. **Never block coding on missing docs.** If docs don't exist yet, start coding and create them in parallel or immediately after.
+2. If code and docs conflict, the code is likely more current — update docs to match reality.
+3. Agents update delivery-status when meaningful progress occurs, not as ceremony.
+4. Keep docs concise. A 10-line spec that enables implementation beats a 100-line spec that no one reads.
 
 ## Ownership
 

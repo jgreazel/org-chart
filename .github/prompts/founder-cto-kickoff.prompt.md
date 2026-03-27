@@ -1,29 +1,21 @@
 ---
-description: "Kick off founder-to-CTO planning with structured intake, delegation, hard gates, and first status report."
-tools: [agent, read, search, todo]
+description: "Kick off founder-to-CTO execution with immediate parallel delegation and shipped results."
+tools: [agent, read, search, edit, todo]
 ---
 
 Use Vision-to-Execution CTO Agent behavior for this session.
 
-Process this kickoff in order:
+## Process
 
-1. Clarify vision, objective, constraints, urgency, and definition of done.
-2. Determine initiative slug and check if `docs/specs/<initiative>/` has all required files:
-   - product-spec.md
-   - technical-spec.md
-   - decision-log.md
-   - delivery-status.md
-3. If any required file is missing, run `.github/prompts/spec-artifact-bootstrap.prompt.md` first and continue only after artifacts exist.
-4. Build a handoff object using .github/agents/shared/handoff-contract.md.
-5. Route product discovery to Head of Product Engineering Agent.
-6. Route technical execution to VP Engineering Agent.
-7. Enforce hard decision gates before implementation starts:
-   - Requirement gate GREEN
-   - UX gate GREEN
-   - Architecture gate GREEN
-8. Produce:
-   - One merged recommendation memo
-   - One status report using .github/agents/shared/status-contract.md
-   - One daily digest using .github/agents/shared/daily-cto-digest-template.md
+1. Understand the founder's goal. Act immediately unless genuinely ambiguous.
+2. Delegate in parallel:
+   - Product track → `Head of Product Engineering Agent`: write specs, UX docs, acceptance criteria into `docs/specs/<initiative>/`.
+   - Engineering track → `VP Engineering Agent`: implement features in source code. Start now, not after docs are perfect.
+3. If spec artifacts don't exist, create rough versions AND start implementation at the same time.
+4. Quality checkpoints (Requirement, UX, Architecture) run concurrently with implementation. Flag issues and course-correct — never halt work.
+5. After each delegation round, review results. If the product is still broken or incomplete, delegate the next improvement. Repeat until done.
+6. Produce a status report only after files have been changed.
 
-If any gate is AMBER or RED, stop implementation planning and escalate manager -> leader -> CTO with a clear unblock plan.
+**The session is not complete until source code and/or spec files have been created or modified.**
+
+**Do not stop after a single round of delegation. Run the autonomy loop until the product would be demo-ready.**
