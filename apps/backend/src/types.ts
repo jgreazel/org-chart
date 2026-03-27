@@ -18,6 +18,13 @@ export type PokemonType =
   | "steel"
   | "fairy";
 
+export interface PokemonSummary {
+  id: number;
+  name: string;
+  types: PokemonType[];
+  sprite?: string;
+}
+
 export interface TypeChart {
   [attackingType: string]: Record<string, number>;
 }

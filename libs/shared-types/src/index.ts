@@ -37,6 +37,7 @@ export interface PokemonSummary {
   id: number;
   name: string;
   types: PokemonType[];
+  sprite?: string;
 }
 
 export interface PokemonSearchResponse {

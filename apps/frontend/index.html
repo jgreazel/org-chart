@@ -7,72 +7,90 @@
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
-    <main class="page">
-      <header>
-        <h1>Pokemon Team Builder</h1>
-        <p>Build a team of up to 6 Pokemon and share it by URL.</p>
+    <div class="app">
+      <!-- ── Top HUD: Team + Coverage ── -->
+      <header class="hud-top">
+        <div class="hud-title-row">
+          <h1>Team Builder</h1>
+          <span id="teamCounter" class="team-counter">0 / 6</span>
+          <button
+            id="saveTeamBtn"
+            class="hud-btn"
+            aria-label="Save current team"
+          >
+            Save
+          </button>
+          <p id="shareLink" class="share-link"></p>
+        </div>
+        <div id="teamSlots" class="team-slots" aria-label="Your team">
+          <div class="team-slot empty" data-slot="0"></div>
+          <div class="team-slot empty" data-slot="1"></div>
+          <div class="team-slot empty" data-slot="2"></div>
+          <div class="team-slot empty" data-slot="3"></div>
+          <div class="team-slot empty" data-slot="4"></div>
+          <div class="team-slot empty" data-slot="5"></div>
+        </div>
+        <div id="coverageBar" class="coverage-bar">
+          <span class="cov-stat" id="covAttack" title="Super-effective coverage"
+            >⚔ <strong>0</strong>/18</span
+          >
+          <span class="cov-stat cov-warn" id="covWeak" title="Shared weaknesses"
+            >🛡 <strong>0</strong></span
+          >
+          <span class="cov-stat cov-gap" id="covGaps" title="Coverage gaps"
+            >◌ <strong>0</strong> gaps</span
+          >
+        </div>
       </header>
 
-      <section class="card">
-        <h2>Team Builder</h2>
-        <div class="controls">
-          <label for="pokemonQuery">Pokemon name</label>
-          <input id="pokemonQuery" type="text" placeholder="Try pikachu" />
-          <button id="addPokemon">Add to team</button>
+      <!-- ── Main scrollable area ── -->
+      <div class="main-area">
+        <div class="browse-controls">
+          <div class="tab-bar" role="tablist">
+            <button
+              class="tab active"
+              role="tab"
+              aria-selected="true"
+              data-tab="pokemon"
+            >
+              Pokemon
+            </button>
+            <button
+              class="tab"
+              role="tab"
+              aria-selected="false"
+              data-tab="teams"
+            >
+              Saved Teams
+            </button>
+          </div>
+          <div class="filter-row">
+            <input
+              id="filterInput"
+              type="text"
+              placeholder="Filter by name..."
+              aria-label="Filter Pokemon"
+              autocomplete="off"
+            />
+            <div id="typeFilters" class="type-filter-row"></div>
+          </div>
         </div>
-        <ul id="pokemonSuggestions" class="suggestions"></ul>
-        <p id="teamMessage" aria-live="polite"></p>
-        <p id="shareLink"></p>
-        <ul id="teamList" class="team-list"></ul>
-      </section>
+        <div
+          id="browseGrid"
+          class="browse-grid"
+          role="list"
+          aria-label="Pokemon to browse"
+        ></div>
+        <div id="teamsPanel" class="teams-panel" hidden>
+          <div id="savedTeamsList" class="saved-teams-list" role="list"></div>
+        </div>
+      </div>
 
-      <section class="card">
-        <h2>API Health</h2>
-        <p id="health">Checking...</p>
-      </section>
-
-      <section class="card">
-        <h2>Type Chart</h2>
-        <p id="typeCount">Loading...</p>
-      </section>
-
-      <section class="card">
-        <h2>Gym Sample</h2>
-              <section class="card">
-                <h2>Team Builder</h2>
-                <div class="controls">
-                  <label for="pokemonQuery">Pokemon name</label>
-                  <input id="pokemonQuery" type="text" placeholder="Try pikachu" />
-                  <button id="addPokemon">Add to team</button>
-                </div>
-                <ul id="pokemonSuggestions" class="suggestions"></ul>
-                <p id="teamMessage" aria-live="polite"></p>
-                <p id="shareLink"></p>
-                <ul id="teamList" class="team-list"></ul>
-              </section>
-
-              <section class="card">
-                <h2>Type Coverage</h2>
-                <div id="coverageSection">
-                  <p class="coverage-empty">Add Pokemon to your team to see coverage analysis.</p>
-                </div>
-              </section>
-
-              <section class="card">
-                <h2>API Health</h2>
-                <p id="health">Checking...</p>
-              </section>
-
-              <section class="card">
-                <h2>Type Chart</h2>
-                <p id="typeCount">Loading...</p>
-              </section>
-
-              <section class="card">
-                <h2>Gym Leaders</h2>
-        <div class="controls">
-          <label for="generationSelect">Generation</label>
-          <select id="generationSelect">
+      <!-- ── Bottom HUD: Gym matchups ── -->
+      <footer class="hud-bottom">
+        <div class="gym-bar-header">
+          <span class="gym-label">Gym</span>
+          <select id="generationSelect" aria-label="Select generation">
             <option value="1">Gen 1</option>
             <option value="2">Gen 2</option>
             <option value="3">Gen 3</option>
@@ -84,9 +102,15 @@
             <option value="9">Gen 9</option>
           </select>
         </div>
-        <ul id="gymLeaders"></ul>
-      </section>
-    </main>
+        <div
+          id="gymStrip"
+          class="gym-strip"
+          aria-label="Gym leader matchups"
+        ></div>
+      </footer>
+
+      <p id="teamMessage" class="toast" aria-live="polite"></p>
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

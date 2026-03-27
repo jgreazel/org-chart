@@ -1,6 +1,5 @@
 import type {
   GenerationGyms,
-  PokemonSearchResponse,
   PokemonSummary,
   TypeChartResponse,
 } from "../../../libs/shared-types/src";
@@ -12,54 +11,144 @@ import {
   restoreTeam,
 } from "./team-state";
 
-const teamListEl = document.getElementById(
-  "teamList",
-) as HTMLUListElement | null;
-const teamMessageEl = document.getElementById(
-  "teamMessage",
-) as HTMLParagraphElement | null;
-const shareLinkEl = document.getElementById(
-  "shareLink",
-) as HTMLParagraphElement | null;
-const queryInputEl = document.getElementById(
-  "pokemonQuery",
-) as HTMLInputElement | null;
-const addButtonEl = document.getElementById(
-  "addPokemon",
-) as HTMLButtonElement | null;
-const suggestionListEl = document.getElementById(
-  "pokemonSuggestions",
-) as HTMLUListElement | null;
+/* ── Constants ── */
+const SAVED_TEAMS_KEY = "ptb-saved-teams";
+const ALL_TYPES = [
+  "normal",
+  "fire",
+  "water",
+  "electric",
+  "grass",
+  "ice",
+  "fighting",
+  "poison",
+  "ground",
+  "flying",
+  "psychic",
+  "bug",
+  "rock",
+  "ghost",
+  "dragon",
+  "dark",
+  "steel",
+  "fairy",
+] as const;
+
+/* ── DOM refs ── */
+const teamCounterEl = document.getElementById("teamCounter")!;
+const shareLinkEl = document.getElementById("shareLink")!;
+const teamSlotsEl = document.getElementById("teamSlots")!;
+const coverageBarEl = document.getElementById("coverageBar")!;
+const covAttackEl = document.getElementById("covAttack")!;
+const covWeakEl = document.getElementById("covWeak")!;
+const covGapsEl = document.getElementById("covGaps")!;
+const browseGridEl = document.getElementById("browseGrid")!;
+const teamsPanelEl = document.getElementById("teamsPanel")!;
+const savedTeamsListEl = document.getElementById("savedTeamsList")!;
+const filterInputEl = document.getElementById(
+  "filterInput",
+) as HTMLInputElement;
+const typeFiltersEl = document.getElementById("typeFilters")!;
 const generationSelectEl = document.getElementById(
   "generationSelect",
-) as HTMLSelectElement | null;
+) as HTMLSelectElement;
+const gymStripEl = document.getElementById("gymStrip")!;
+const toastEl = document.getElementById("teamMessage")!;
+const saveTeamBtnEl = document.getElementById("saveTeamBtn")!;
 
+/* ── State ── */
 let team: PokemonSummary[] = [];
-let currentSearchResults: PokemonSummary[] = [];
-let revealAnimated = false;
+let fullCatalog: PokemonSummary[] = [];
 let storedTypeChart: Record<string, Record<string, number>> | null = null;
+let activeTypeFilter: string | null = null;
+let currentTab: "pokemon" | "teams" = "pokemon";
+let currentGymGeneration = 1;
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+let filterDebounce: ReturnType<typeof setTimeout> | null = null;
 
+interface SavedTeam {
+  name: string;
+  members: PokemonSummary[];
+  created: number;
+}
+
+/* ── Helpers ── */
 function typePill(type: string): string {
   return `<span class="type-pill type-${type}">${type}</span>`;
 }
 
-function computeTypeCoverage(
-  teamPokemon: PokemonSummary[],
-  chart: Record<string, Record<string, number>>,
-) {
-  const allTypes = Object.keys(chart);
+function showToast(msg: string) {
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toastEl.classList.remove("show"), 2000);
+}
+
+/* ── Team management ── */
+function saveTeam() {
+  localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(team));
+  const newUrl = applyTeamToUrl(window.location.href, team);
+  window.history.replaceState({}, "", newUrl);
+}
+
+function updateHud() {
+  // Counter
+  teamCounterEl.textContent = `${team.length} / 6`;
+  teamCounterEl.className = `team-counter${team.length >= 6 ? " team-full" : ""}`;
+
+  // Share link
+  if (team.length > 0) {
+    shareLinkEl.textContent = window.location.href;
+    shareLinkEl.title = window.location.href;
+  } else {
+    shareLinkEl.textContent = "";
+  }
+
+  // Slots
+  const slots = teamSlotsEl.querySelectorAll(".team-slot");
+  slots.forEach((slot, i) => {
+    const pokemon = team[i];
+    if (pokemon) {
+      slot.className = "team-slot filled";
+      slot.innerHTML = `
+        <span class="slot-name">${pokemon.name}</span>
+        <span class="slot-types">${pokemon.types.map(typePill).join("")}</span>
+        <button class="slot-remove" aria-label="Remove ${pokemon.name}">\u2715</button>`;
+      slot.querySelector(".slot-remove")!.addEventListener("click", (e) => {
+        e.stopPropagation();
+        removePokemon(pokemon.id);
+      });
+    } else {
+      slot.className = "team-slot empty";
+      slot.innerHTML = "";
+    }
+  });
+
+  // Coverage bar
+  updateCoverageBar();
+}
+
+function updateCoverageBar() {
+  if (!storedTypeChart || team.length === 0) {
+    covAttackEl.innerHTML = "\u2694 <strong>0</strong>/18";
+    covWeakEl.innerHTML = "\ud83d\udee1 <strong>0</strong>";
+    covGapsEl.innerHTML = "\u25CC <strong>0</strong> gaps";
+    return;
+  }
+
+  const allTypes = Object.keys(storedTypeChart);
   const attackCoverage = new Set<string>();
   const weaknessHits = new Map<string, number>();
 
-  for (const pokemon of teamPokemon) {
+  for (const pokemon of team) {
     for (const atkType of pokemon.types) {
-      const row = chart[atkType] ?? {};
+      const row = storedTypeChart[atkType] ?? {};
       for (const [defType, eff] of Object.entries(row)) {
         if (eff >= 2) attackCoverage.add(defType);
       }
     }
     for (const atkType of allTypes) {
-      const row = chart[atkType] ?? {};
+      const row = storedTypeChart[atkType] ?? {};
       let totalEff = 1;
       for (const defType of pokemon.types) {
         totalEff *= row[defType] ?? 1;
@@ -70,327 +159,348 @@ function computeTypeCoverage(
     }
   }
 
-  const coverageGaps = allTypes.filter((t) => !attackCoverage.has(t)).sort();
-  const teamWeaknesses = [...weaknessHits.entries()]
-    .filter(([, count]) => count >= 2)
-    .sort((a, b) => b[1] - a[1])
-    .map(([type]) => type);
+  const gaps = allTypes.filter((t) => !attackCoverage.has(t)).length;
+  const shared = [...weaknessHits.values()].filter((c) => c >= 2).length;
 
-  return {
-    attackCoverage: [...attackCoverage].sort(),
-    teamWeaknesses,
-    coverageGaps,
-  };
+  covAttackEl.innerHTML = `\u2694 <strong>${attackCoverage.size}</strong>/18`;
+  covWeakEl.innerHTML = `\ud83d\udee1 <strong>${shared}</strong>`;
+  covGapsEl.innerHTML = `\u25CC <strong>${gaps}</strong> gaps`;
 }
 
-function renderTypeCoverage() {
-  const section = document.getElementById("coverageSection");
-  if (!section) return;
-
-  if (!storedTypeChart || team.length === 0) {
-    section.innerHTML =
-      '<p class="coverage-empty">Add Pokemon to your team to see coverage analysis.</p>';
+function addPokemon(pokemon: PokemonSummary) {
+  if (!canAddToTeam(team)) {
+    showToast("Team full! Remove one first.");
     return;
   }
-
-  const { attackCoverage, teamWeaknesses, coverageGaps } = computeTypeCoverage(
-    team,
-    storedTypeChart,
-  );
-
-  section.innerHTML = `
-    <div class="coverage-grid">
-      <div class="coverage-item">
-        <h3>Super Effective Against <span class="badge badge-green">${attackCoverage.length} / 18</span></h3>
-        <div class="type-pills">${attackCoverage.length > 0 ? attackCoverage.map(typePill).join("") : '<span class="coverage-empty">None yet</span>'}</div>
-      </div>
-      <div class="coverage-item">
-        <h3>Team Weaknesses <span class="badge badge-red">${teamWeaknesses.length}</span></h3>
-        ${
-          teamWeaknesses.length > 0
-            ? `<div class="type-pills">${teamWeaknesses.map(typePill).join("")}</div>`
-            : '<p class="coverage-ok">No shared weaknesses!</p>'
-        }
-      </div>
-      <div class="coverage-item">
-        <h3>Coverage Gaps <span class="badge badge-amber">${coverageGaps.length}</span></h3>
-        ${
-          coverageGaps.length > 0
-            ? `<div class="type-pills">${coverageGaps.map(typePill).join("")}</div>`
-            : '<p class="coverage-ok">Full type coverage!</p>'
-        }
-      </div>
-    </div>`;
-}
-
-function saveTeam() {
-  localStorage.setItem(TEAM_STORAGE_KEY, JSON.stringify(team));
-
-  const newRelativeUrl = applyTeamToUrl(window.location.href, team);
-  window.history.replaceState({}, "", newRelativeUrl);
-  updateShareLink();
-}
-
-function updateShareLink() {
-  if (!shareLinkEl) return;
-
-  if (team.length === 0) {
-    shareLinkEl.textContent = "Build a team to generate a shareable link.";
+  if (isDuplicate(team, pokemon)) {
+    showToast(`${pokemon.name} is already on your team.`);
     return;
   }
-
-  shareLinkEl.textContent = `Share: ${window.location.href}`;
+  team.push(pokemon);
+  saveTeam();
+  updateHud();
+  renderBrowseGrid();
+  loadGymStrip(currentGymGeneration);
+  showToast(`${pokemon.name} added!`);
 }
 
-function setMessage(message: string) {
-  if (teamMessageEl) {
-    teamMessageEl.textContent = message;
-  }
+function removePokemon(id: number) {
+  const removed = team.find((p) => p.id === id);
+  team = team.filter((p) => p.id !== id);
+  saveTeam();
+  updateHud();
+  renderBrowseGrid();
+  loadGymStrip(currentGymGeneration);
+  if (removed) showToast(`${removed.name} removed.`);
 }
 
-function renderTeam() {
-  if (!teamListEl) return;
+/* ── Browse grid ── */
+function getFilteredCatalog(): PokemonSummary[] {
+  let pool = fullCatalog;
+  const q = filterInputEl.value.trim().toLowerCase();
 
-  teamListEl.innerHTML = "";
-
-  if (team.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No Pokemon selected yet.";
-    teamListEl.appendChild(li);
-    renderTypeCoverage();
-    return;
+  if (activeTypeFilter) {
+    pool = pool.filter((p) => p.types.includes(activeTypeFilter as never));
   }
 
-  for (const pokemon of team) {
-    const li = document.createElement("li");
-    li.className = "team-item item-enter";
-
-    const label = document.createElement("span");
-    label.className = "team-item-label";
-    label.innerHTML = `<strong>${pokemon.name}</strong> <span class="team-item-id">#${pokemon.id}</span> ${pokemon.types.map(typePill).join("")}`;
-
-    const removeButton = document.createElement("button");
-    removeButton.textContent = "Remove";
-    removeButton.type = "button";
-    removeButton.addEventListener("click", () => {
-      li.classList.remove("item-enter");
-      li.classList.add("item-exit");
-
-      team = team.filter((candidate) => candidate.id !== pokemon.id);
-
-      window.setTimeout(() => {
-        renderTeam();
-        saveTeam();
-        setMessage(`${pokemon.name} removed from team.`);
-      }, 180);
+  if (q) {
+    pool = pool.filter((p) => {
+      if (p.name.includes(q)) return true;
+      const words = p.name.split(/\s+/);
+      return words.some((w) => w.startsWith(q));
     });
-
-    li.appendChild(label);
-    li.appendChild(removeButton);
-    teamListEl.appendChild(li);
   }
 
-  renderTypeCoverage();
+  return pool;
 }
 
-function renderSuggestions() {
-  if (!suggestionListEl) return;
-  suggestionListEl.innerHTML = "";
+function renderBrowseGrid() {
+  const filtered = getFilteredCatalog();
+  browseGridEl.innerHTML = "";
 
-  for (const pokemon of currentSearchResults.slice(0, 6)) {
-    const li = document.createElement("li");
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "suggestion-button";
-    button.innerHTML = `${pokemon.name} ${pokemon.types.map(typePill).join("")}`;
-    button.addEventListener("click", () => {
-      addPokemonByName(pokemon.name);
-      if (queryInputEl) {
-        queryInputEl.value = pokemon.name;
+  if (filtered.length === 0) {
+    browseGridEl.innerHTML =
+      '<div class="browse-empty">No Pokemon match your filter.</div>';
+    return;
+  }
+
+  for (const pokemon of filtered) {
+    const inTeam = team.some((t) => t.id === pokemon.id);
+    const card = document.createElement("div");
+    card.className = `poke-card${inTeam ? " in-team" : ""}`;
+    card.setAttribute("role", "listitem");
+    card.innerHTML = `
+      <span class="poke-id">#${pokemon.id}</span>
+      <span class="poke-name">${pokemon.name}</span>
+      <span class="poke-types">${pokemon.types.map(typePill).join("")}</span>`;
+    card.addEventListener("click", () => {
+      if (inTeam) {
+        removePokemon(pokemon.id);
+      } else {
+        addPokemon(pokemon);
       }
     });
-    li.appendChild(button);
-    suggestionListEl.appendChild(li);
+    browseGridEl.appendChild(card);
   }
 }
 
-async function searchPokemon(query: string) {
-  const res = await fetch(`/api/pokemon/search?q=${encodeURIComponent(query)}`);
-  const data = (await res.json()) as PokemonSearchResponse;
-  currentSearchResults = data.results;
+/* ── Type filter pills ── */
+function renderTypeFilters() {
+  typeFiltersEl.innerHTML = "";
+  for (const type of ALL_TYPES) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `type-filter-btn type-${type}${activeTypeFilter === type ? " active" : ""}`;
+    btn.textContent = type;
+    btn.addEventListener("click", () => {
+      activeTypeFilter = activeTypeFilter === type ? null : type;
+      renderTypeFilters();
+      renderBrowseGrid();
+    });
+    typeFiltersEl.appendChild(btn);
+  }
 }
 
-function addPokemonByName(name: string) {
-  const match = currentSearchResults.find(
-    (pokemon) => pokemon.name.toLowerCase() === name.toLowerCase(),
-  );
+/* ── Tabs ── */
+function switchTab(tab: "pokemon" | "teams") {
+  currentTab = tab;
+  document.querySelectorAll(".tab").forEach((t) => {
+    const isActive = t.getAttribute("data-tab") === tab;
+    t.classList.toggle("active", isActive);
+    t.setAttribute("aria-selected", String(isActive));
+  });
 
-  if (!match) {
-    setMessage("No matching Pokemon found. Try another name.");
+  const filterRow = document.querySelector(".filter-row") as HTMLElement;
+
+  if (tab === "pokemon") {
+    browseGridEl.hidden = false;
+    teamsPanelEl.hidden = true;
+    if (filterRow) filterRow.hidden = false;
+  } else {
+    browseGridEl.hidden = true;
+    teamsPanelEl.hidden = false;
+    if (filterRow) filterRow.hidden = true;
+    renderSavedTeams();
+  }
+}
+
+/* ── Saved teams ── */
+function getSavedTeams(): SavedTeam[] {
+  try {
+    return JSON.parse(
+      localStorage.getItem(SAVED_TEAMS_KEY) ?? "[]",
+    ) as SavedTeam[];
+  } catch {
+    return [];
+  }
+}
+
+function persistSavedTeams(teams: SavedTeam[]) {
+  localStorage.setItem(SAVED_TEAMS_KEY, JSON.stringify(teams));
+}
+
+function saveCurrentTeam() {
+  if (team.length === 0) {
+    showToast("Add Pokemon to your team first!");
     return;
   }
+  const teams = getSavedTeams();
+  const name = `Team ${teams.length + 1} (${team.map((p) => p.name).join(", ")})`;
+  teams.unshift({ name, members: [...team], created: Date.now() });
+  persistSavedTeams(teams);
+  showToast("Team saved!");
+  if (currentTab === "teams") renderSavedTeams();
+}
 
-  if (!canAddToTeam(team)) {
-    setMessage("Team is full. Remove one before adding another.");
-    return;
-  }
-
-  if (isDuplicate(team, match)) {
-    setMessage("That Pokemon is already in your team.");
-    return;
-  }
-
-  team.push(match);
-  renderTeam();
+function loadSavedTeam(saved: SavedTeam) {
+  team = saved.members
+    .filter((m) => fullCatalog.some((c) => c.id === m.id))
+    .slice(0, 6);
   saveTeam();
-  setMessage(`${match.name} added.`);
+  updateHud();
+  renderBrowseGrid();
+  loadGymStrip(currentGymGeneration);
+  switchTab("pokemon");
+  showToast(`Loaded: ${saved.name}`);
 }
 
+function deleteSavedTeam(index: number) {
+  const teams = getSavedTeams();
+  teams.splice(index, 1);
+  persistSavedTeams(teams);
+  renderSavedTeams();
+  showToast("Team deleted.");
+}
+
+function renderSavedTeams() {
+  const teams = getSavedTeams();
+  savedTeamsListEl.innerHTML = "";
+
+  if (teams.length === 0) {
+    savedTeamsListEl.innerHTML =
+      '<div class="teams-empty">No saved teams yet. Build a team and press Save!</div>';
+    return;
+  }
+
+  teams.forEach((saved, i) => {
+    const card = document.createElement("div");
+    card.className = "saved-team-card";
+    card.setAttribute("role", "listitem");
+
+    const members = saved.members
+      .map((m) => `<span class="saved-team-member">${m.name}</span>`)
+      .join("");
+
+    card.innerHTML = `
+      <div class="saved-team-name">${saved.name}</div>
+      <div class="saved-team-members">${members}</div>
+      <div class="saved-team-actions">
+        <button class="hud-btn load-btn">Load</button>
+        <button class="hud-btn del-btn" style="color:#f87171">Delete</button>
+      </div>`;
+
+    card.querySelector(".load-btn")!.addEventListener("click", (e) => {
+      e.stopPropagation();
+      loadSavedTeam(saved);
+    });
+    card.querySelector(".del-btn")!.addEventListener("click", (e) => {
+      e.stopPropagation();
+      deleteSavedTeam(i);
+    });
+
+    savedTeamsListEl.appendChild(card);
+  });
+}
+
+/* ── Gym matchup strip ── */
+function computeGymMatchup(
+  pokemon: PokemonSummary,
+  gymTypes: string[],
+  chart: Record<string, Record<string, number>>,
+): "strong" | "weak" | "neutral" {
+  let bestAtk = 0;
+  let worstDef = 0;
+  for (const atkType of pokemon.types) {
+    for (const defType of gymTypes) {
+      if ((chart[atkType]?.[defType] ?? 1) >= 2) bestAtk++;
+    }
+  }
+  for (const gymType of gymTypes) {
+    for (const defType of pokemon.types) {
+      if ((chart[gymType]?.[defType] ?? 1) >= 2) worstDef++;
+    }
+  }
+  if (bestAtk > 0 && worstDef === 0) return "strong";
+  if (worstDef > 0 && bestAtk === 0) return "weak";
+  return "neutral";
+}
+
+async function loadGymStrip(generation = 1) {
+  currentGymGeneration = generation;
+  try {
+    const res = await fetch(`/api/gyms?generation=${generation}`);
+    const data = (await res.json()) as GenerationGyms;
+    gymStripEl.innerHTML = "";
+
+    for (const leader of data.leaders) {
+      const chip = document.createElement("div");
+      chip.className = "gym-chip";
+
+      let dotsHtml = "";
+      if (team.length > 0 && storedTypeChart) {
+        const dots = team.map((p) => {
+          const result = computeGymMatchup(
+            p,
+            leader.pokemonTypes,
+            storedTypeChart!,
+          );
+          return `<span class="gym-dot dot-${result}" title="${p.name}: ${result}"></span>`;
+        });
+        dotsHtml = `<span class="gym-chip-matchup">${dots.join("")}</span>`;
+      }
+
+      chip.innerHTML = `
+        <span class="gym-chip-name">${leader.name}</span>
+        <span class="gym-chip-types">${leader.pokemonTypes.map(typePill).join("")}</span>
+        ${dotsHtml}`;
+      gymStripEl.appendChild(chip);
+    }
+  } catch {
+    gymStripEl.innerHTML =
+      '<span style="color:var(--ink-muted);font-size:0.7rem">Failed to load gyms.</span>';
+  }
+}
+
+/* ── Data loading ── */
+async function loadCatalog() {
+  try {
+    const res = await fetch("/api/pokemon");
+    const data = (await res.json()) as { results: PokemonSummary[] };
+    fullCatalog = data.results;
+  } catch {
+    // Fallback: try search with empty query
+    try {
+      const res = await fetch("/api/pokemon/search?q=");
+      const data = (await res.json()) as { results: PokemonSummary[] };
+      fullCatalog = data.results;
+    } catch {
+      fullCatalog = [];
+    }
+  }
+}
+
+async function loadTypeChart() {
+  try {
+    const res = await fetch("/api/types/chart");
+    const data = (await res.json()) as TypeChartResponse;
+    storedTypeChart = data.chart;
+  } catch {
+    storedTypeChart = null;
+  }
+}
+
+/* ── Init ── */
 function hydrateTeam() {
   const fromStorageRaw = localStorage.getItem(TEAM_STORAGE_KEY);
   const fromStorage = fromStorageRaw
     ? (JSON.parse(fromStorageRaw) as PokemonSummary[])
     : [];
-
-  team = restoreTeam(window.location.href, fromStorage, currentSearchResults);
-
-  renderTeam();
-  updateShareLink();
-}
-
-async function loadHealth() {
-  const el = document.getElementById("health");
-  if (!el) return;
-
-  try {
-    const res = await fetch("/health");
-    const data = await res.json();
-    el.textContent =
-      data.status === "ok" ? "API is healthy" : "API status unknown";
-  } catch {
-    el.textContent = "API unavailable. Start backend on port 3001.";
-  }
-}
-
-async function loadTypeChart() {
-  const el = document.getElementById("typeCount");
-  if (!el) return;
-
-  try {
-    const res = await fetch("/api/types/chart");
-    const data = (await res.json()) as TypeChartResponse;
-    storedTypeChart = data.chart;
-    el.textContent = `Loaded ${data.typeCount} types.`;
-    renderTypeCoverage();
-  } catch {
-    el.textContent = "Failed to load type chart.";
-  }
-}
-
-async function loadGymSample(generation = 1) {
-  const list = document.getElementById("gymLeaders");
-  if (!list) return;
-
-  try {
-    const res = await fetch(`/api/gyms?generation=${generation}`);
-    const data = (await res.json()) as GenerationGyms;
-
-    list.innerHTML = "";
-    if (!revealAnimated) {
-      list.classList.add("reveal");
-      revealAnimated = true;
-    }
-
-    for (const leader of data.leaders) {
-      const li = document.createElement("li");
-      li.className = "gym-leader-item";
-      li.innerHTML = `<span class="gym-leader-name">${leader.name}</span><span class="type-pills">${leader.pokemonTypes.map(typePill).join("")}</span>`;
-      list.appendChild(li);
-    }
-
-    if (data.leaders.length === 0) {
-      const li = document.createElement("li");
-      li.textContent = "No leaders yet.";
-      list.appendChild(li);
-    }
-  } catch {
-    list.innerHTML = "<li>Failed to load gyms.</li>";
-  }
+  team = restoreTeam(window.location.href, fromStorage, fullCatalog);
 }
 
 function wireEvents() {
-  queryInputEl?.addEventListener("input", async (event) => {
-    const target = event.target as HTMLInputElement;
-    const query = target.value.trim();
-
-    try {
-      await searchPokemon(query);
-      renderSuggestions();
-    } catch {
-      setMessage("Unable to load suggestions right now.");
-    }
+  // Filter input with debounce
+  filterInputEl.addEventListener("input", () => {
+    if (filterDebounce) clearTimeout(filterDebounce);
+    filterDebounce = setTimeout(() => renderBrowseGrid(), 150);
   });
 
-  addButtonEl?.addEventListener("click", async () => {
-    const query = queryInputEl?.value.trim().toLowerCase();
-    if (!query) {
-      setMessage("Enter a Pokemon name first.");
-      return;
-    }
-
-    try {
-      await searchPokemon(query);
-      renderSuggestions();
-      addPokemonByName(query);
-    } catch {
-      setMessage("Search failed. Check backend status and retry.");
-    }
+  // Tab switching
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      switchTab(tab.getAttribute("data-tab") as "pokemon" | "teams");
+    });
   });
 
-  generationSelectEl?.addEventListener("change", async (event) => {
-    const target = event.target as HTMLSelectElement;
-    const generation = Number(target.value);
-    await loadGymSample(generation);
+  // Generation select
+  generationSelectEl.addEventListener("change", () => {
+    loadGymStrip(Number(generationSelectEl.value));
   });
+
+  // Save team button
+  saveTeamBtnEl.addEventListener("click", () => saveCurrentTeam());
 }
 
-function initAds() {
-  const publisherId = (
-    import.meta.env.VITE_ADSENSE_CLIENT as string | undefined
-  )?.trim();
-  if (!publisherId) return;
+async function init() {
+  wireEvents();
+  renderTypeFilters();
 
-  const script = document.createElement("script");
-  script.async = true;
-  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
-  script.setAttribute("crossorigin", "anonymous");
-  document.head.appendChild(script);
+  await Promise.all([loadCatalog(), loadTypeChart()]);
 
-  const coverageCard = document
-    .getElementById("coverageSection")
-    ?.closest(".card");
-  if (coverageCard) {
-    const adWrap = document.createElement("div");
-    adWrap.className = "ad-unit";
-    const ins = document.createElement("ins");
-    ins.className = "adsbygoogle";
-    ins.style.cssText = "display:block";
-    ins.setAttribute("data-ad-client", publisherId);
-    ins.setAttribute("data-ad-format", "auto");
-    ins.setAttribute("data-full-width-responsive", "true");
-    adWrap.appendChild(ins);
-    coverageCard.insertAdjacentElement("afterend", adWrap);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    ((window as any).adsbygoogle = (window as any).adsbygoogle || []).push({});
-  }
-}
-
-void searchPokemon("").then(() => {
   hydrateTeam();
-  renderSuggestions();
-});
-wireEvents();
-void loadHealth();
-void loadTypeChart();
-void loadGymSample();
-initAds();
+  updateHud();
+  renderBrowseGrid();
+  void loadGymStrip();
+}
+
+void init();

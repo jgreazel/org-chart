@@ -4,6 +4,7 @@
 
 - Health: AMBER
 - Summary: Feature implementation has started. Requirement and Architecture remain GREEN. UX remains AMBER pending checklist execution evidence after local dependency install and run.
+
 ## Current Status
 
 - Health: AMBER
@@ -89,6 +90,7 @@
 - Dependency install and first frontend test run
 - Google AdSense account application (Founder)
 - Stripe account setup (Founder)
+
 ## In Progress
 
 - QA conversion of AC traceability matrix into executable test cases
